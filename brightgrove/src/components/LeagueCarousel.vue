@@ -18,17 +18,20 @@ export default {
   props: {
     leagueName: {
       type: String,
-      required: true
+      required: true,
     },
     matches: {
       type: Array,
-      required: true
+      required: true,
     },
     loading: {
       type: Boolean,
-      default: false
-    }
-  }
+      default: false,
+    },
+  },
+  mounted() {
+    console.log('mounted', this.leagueName)
+  },
 }
 </script>
 

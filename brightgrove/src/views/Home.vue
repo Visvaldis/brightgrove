@@ -3,12 +3,14 @@
     <AppHeader />
     <MatchesSwitcher :currentView="currentView" @update:view="switchView" />
     <!-- Render carousels -->
-    <div v-for="comp in competitions" :key="comp.code">
-      <LeagueCarousel 
-        :leagueName="comp.name" 
-        :matches="leagueMatches[comp.code] ? leagueMatches[comp.code][currentView] : []"
-        :loading="loading[comp.code]"
-      />
+    <div v-if="currentMatches">
+      <div v-for="comp in competitions" :key="comp.code">
+        <LeagueCarousel
+          :leagueName="comp.name"
+          :matches="currentMatches[comp.code] ? currentMatches[comp.code] : []"
+          :loading="loading[comp.code]"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -17,48 +19,47 @@
 import AppHeader from '@/components/Header.vue'
 import MatchesSwitcher from '@/components/MatchesSwitcher.vue'
 import LeagueCarousel from '@/components/LeagueCarousel.vue'
-import {fetchMatchesByStatus, matchStatuses} from '@/services/footballDataService.js'
-import {competitions} from '@/consts/competitions.js'
+import { fetchMatchesByStatus, matchStatuses } from '@/services/footballDataService.js'
+import { competitions } from '@/consts/competitions.js'
 
 export default {
-  name: 'Home',
+  name: 'HomeView',
   components: { AppHeader, MatchesSwitcher, LeagueCarousel },
   data() {
     return {
       currentView: 'recent', // 'recent' or 'upcoming'
-      recentMatches: {},   // { [leagueCode]: []}
-      upcomingMatches: {},  // { [leagueCode]: []}
-      leagueMatches: {}, // { [leagueCode]: { recent: [], upcoming: [] }}
-      loading: {} // { [leagueCode]: boolean }
+      finishedMatches: null, // { [leagueCode]: []}
+      scheduledMatches: null, // { [leagueCode]: []}
+      currentMatches: null,
+      loading: {}, // { [leagueCode]: boolean }
     }
   },
   computed: {
+    competitions() {
+      return competitions
+    },
   },
   async mounted() {
-    await this.loadRecent()
-
+    this.finishedMatches = await this.loadMatches(matchStatuses.finished)
+    this.currentMatches = this.finishedMatches
   },
+
   methods: {
-    async loadRecent() {
-      console.log(competitions);
-      
+    async loadMatches(matchStatus) {
+      console.log(this.competitions)
+
       // Fetch data for each competition once
-      for (const comp of competitions) {
+      for (const comp of this.competitions) {
         this.loading[comp.code] = true
 
-        const data = await fetchMatchesByStatus(comp.code, matchStatuses.finished)
+        const data = await fetchMatchesByStatus(comp.code, matchStatus)
         // Map odds and ensure no placeholders are needed
-        console.log('match', data);
 
-        const mappedRecent = data.map(this.mapMatchData)
-       // const mappedUpcoming = data.upcoming.map(this.mapMatchData)
-
-        this.leagueMatches[comp.code] = {
-          recent: mappedRecent,
-       //   upcoming: mappedUpcoming
-        }
+        const mappedMatches = data.map(this.mapMatchData)
+        // const mappedUpcoming = data.upcoming.map(this.mapMatchData)
 
         this.loading[comp.code] = false
+        return mappedMatches
       }
     },
 
@@ -70,10 +71,10 @@ export default {
         mappedOdds = {
           homeWin: match.odds.homeWin || 'N/A',
           draw: match.odds.draw || 'N/A',
-          awayWin: match.odds.awayWin || 'N/A'
+          awayWin: match.odds.awayWin || 'N/A',
         }
       }
-      
+
       return {
         id: match.id,
         homeTeam: match.homeTeam,
@@ -81,14 +82,17 @@ export default {
         utcDate: match.utcDate,
         venue: match.venue || 'Unknown',
         status: match.status,
-        odds: mappedOdds
+        odds: mappedOdds,
       }
     },
 
     async switchView(view) {
       this.currentView = view
-      // No need to reload data since we stored both recent and upcoming
-    }
-  }
+      if (!this.scheduledMatches) {
+        this.scheduledMatches = await this.loadMatches(matchStatuses.sheduled)
+      }
+      this.currentMatches = this.scheduledMatches
+    },
+  },
 }
 </script>

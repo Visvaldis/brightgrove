@@ -1,13 +1,14 @@
 <template>
   <div class="switcher">
-    <button 
-      :class="{active: currentView === 'recent'}" 
-      @click="$emit('update:view','recent')"
-    >Recent Matches</button>
-    <button 
-      :class="{active: currentView === 'upcoming'}"
-      @click="$emit('update:view','upcoming')"
-    >Upcoming Matches</button>
+    <button :class="{ active: currentView === 'recent' }" @click="$emit('update:view', 'recent')">
+      Recent Matches
+    </button>
+    <button
+      :class="{ active: currentView === 'upcoming' }"
+      @click="$emit('update:view', 'upcoming')"
+    >
+      Upcoming Matches
+    </button>
   </div>
 </template>
 
@@ -17,9 +18,9 @@ export default {
   props: {
     currentView: {
       type: String,
-      required: true
-    }
-  }
+      required: true,
+    },
+  },
 }
 </script>
 
