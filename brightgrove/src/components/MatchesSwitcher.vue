@@ -1,12 +1,14 @@
 <template>
   <div class="switcher">
-    <button :class="{ active: currentView === statuses.finished }"
-     @click="$emit('update:view', statuses.finished )">
+    <button
+      :class="{ active: currentView === statuses.finished }"
+      @click="$emit('update:view', statuses.finished)"
+    >
       Recent Matches
     </button>
     <button
       :class="{ active: currentView === statuses.scheduled }"
-      @click="$emit('update:view', statuses.scheduled )"
+      @click="$emit('update:view', statuses.scheduled)"
     >
       Upcoming Matches
     </button>
@@ -29,12 +31,11 @@ export default {
       tt: matchStatuses.finished,
     }
   },
-  computed:
-  {
-    statuses(){
+  computed: {
+    statuses() {
       return matchStatuses
-    }
-  }
+    },
+  },
 }
 </script>
 

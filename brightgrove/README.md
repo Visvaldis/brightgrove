@@ -1,15 +1,5 @@
 # brightgrove
 
-This template should help get you started developing with Vue 3 in Vite.
-
-## Recommended IDE Setup
-
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
 ## Project Setup
 
 ```sh
@@ -28,8 +18,15 @@ npm run dev
 npm run build
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+### Page example
+![alt text](image.png)
 
-```sh
-npm run lint
-```
+
+### Future improvement
+
+* Deal with rate limiting
+* Improve CORS handling
+* Better 'loading' so user wont see empty page
+* Improve CSS
+* Deploy to cloud
+* Refresh button / webhook to update finished matches
