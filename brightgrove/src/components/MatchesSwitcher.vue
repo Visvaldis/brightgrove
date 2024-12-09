@@ -1,11 +1,12 @@
 <template>
   <div class="switcher">
-    <button :class="{ active: currentView === 'recent' }" @click="$emit('update:view', 'recent')">
+    <button :class="{ active: currentView === statuses.finished }"
+     @click="$emit('update:view', statuses.finished )">
       Recent Matches
     </button>
     <button
-      :class="{ active: currentView === 'upcoming' }"
-      @click="$emit('update:view', 'upcoming')"
+      :class="{ active: currentView === statuses.scheduled }"
+      @click="$emit('update:view', statuses.scheduled )"
     >
       Upcoming Matches
     </button>
@@ -13,6 +14,8 @@
 </template>
 
 <script>
+import { matchStatuses } from '@/consts/matchStatuses.js'
+
 export default {
   name: 'MatchesSwitcher',
   props: {
@@ -21,6 +24,17 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      tt: matchStatuses.finished,
+    }
+  },
+  computed:
+  {
+    statuses(){
+      return matchStatuses
+    }
+  }
 }
 </script>
 

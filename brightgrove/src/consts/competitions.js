@@ -1,6 +1,4 @@
-export { competitions }
-
-const competitions = [
+export const competitions = [
   { code: 'PPL', name: 'Primeira Liga (Portugal)' },
   { code: 'PL', name: 'Premier League (England)' },
   { code: 'DED', name: 'Eredivisie (Netherlands)' },

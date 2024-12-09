@@ -19,7 +19,8 @@
 import AppHeader from '@/components/Header.vue'
 import MatchesSwitcher from '@/components/MatchesSwitcher.vue'
 import LeagueCarousel from '@/components/LeagueCarousel.vue'
-import { fetchMatchesByStatus, matchStatuses } from '@/services/footballDataService.js'
+import { fetchMatchesByStatus } from '@/services/footballDataService.js'
+import { matchStatuses } from '@/consts/matchStatuses.js'
 import { competitions } from '@/consts/competitions.js'
 
 export default {
@@ -27,7 +28,7 @@ export default {
   components: { AppHeader, MatchesSwitcher, LeagueCarousel },
   data() {
     return {
-      currentView: 'recent', // 'recent' or 'upcoming'
+      currentView: matchStatuses.finished,
       finishedMatches: null, // { [leagueCode]: []}
       scheduledMatches: null, // { [leagueCode]: []}
       currentMatches: null,
@@ -42,25 +43,24 @@ export default {
   async mounted() {
     this.finishedMatches = await this.loadMatches(matchStatuses.finished)
     this.currentMatches = this.finishedMatches
+    console.log(this.currentMatches);    
   },
 
   methods: {
     async loadMatches(matchStatus) {
       console.log(this.competitions)
-
+      let matches = [];
       // Fetch data for each competition once
       for (const comp of this.competitions) {
         this.loading[comp.code] = true
 
         const data = await fetchMatchesByStatus(comp.code, matchStatus)
-        // Map odds and ensure no placeholders are needed
-
         const mappedMatches = data.map(this.mapMatchData)
-        // const mappedUpcoming = data.upcoming.map(this.mapMatchData)
 
         this.loading[comp.code] = false
-        return mappedMatches
+        matches[comp.code] = mappedMatches
       }
+      return matches;
     },
 
     mapMatchData(match) {
@@ -87,11 +87,14 @@ export default {
     },
 
     async switchView(view) {
+      
       this.currentView = view
-      if (!this.scheduledMatches) {
-        this.scheduledMatches = await this.loadMatches(matchStatuses.sheduled)
+      
+      if (this.currentView === matchStatuses.scheduled && !this.scheduledMatches) {
+        this.scheduledMatches = await this.loadMatches(matchStatuses.scheduled);
       }
-      this.currentMatches = this.scheduledMatches
+
+      this.currentMatches = this.currentView === matchStatuses.scheduled? this.scheduledMatches : this.finishedMatches;
     },
   },
 }
